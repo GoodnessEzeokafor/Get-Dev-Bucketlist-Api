@@ -47,9 +47,18 @@ passport.deserializeUser(User.deserializeUser())
 app.use(flash());
 
 // Get BucketList
-app.get("/bucketlists",isLoggedIn,(req, res)=> {  
+app.get("/bucketlists",isLoggedIn,(req, res)=> { 
+    var page = parseInt(req.query.page)
+    var limit = parseInt(req.query.limit)
+    var query = {}
+    if(page < 0 || page === 0){
+        response = {"error":true,"message":"invalid page number, should start with 1"}
+        return res.send(response)
+    } 
+    query.skip = limit * (page - 1)
+    query.limit = limit
     // res.json(buckets)
-    BucketList.find({}, (err, bucketlist)=> {
+    BucketList.find({},{},query, (err, bucketlist)=> {   
         if(err){
             console.log(err)
         } else {
